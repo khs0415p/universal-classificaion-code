@@ -72,8 +72,8 @@ def multi_train(rank, ngpus_per_node, config, args):
 
     if args.mode == 'train':
         trainer.train()
-    elif args.mode == 'test':
-        raise NotImplementedError
+    else :
+        raise ValueError
 
 
 if __name__ == "__main__":

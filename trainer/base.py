@@ -13,11 +13,12 @@ from utils import (
     LOGGER,
 )
 from utils.file_utils import make_dir, remove_file
+from utils.metric_utils import save_confusion_matrix
 from transformers import (
     get_linear_schedule_with_warmup,
     get_cosine_schedule_with_warmup,
 )
-from models import BioModel
+from models import ClassificationModel
 
 
 
@@ -98,7 +99,7 @@ class BaseTrainer:
 
     def init_model(self):
         
-        model = BioModel(self.config)
+        model = ClassificationModel(self.config)
         if self.config.continuous or self.config.mode == 'test':
             checkpoint_path = self.config.checkpoint
             try:
@@ -256,6 +257,7 @@ class BaseTrainer:
 
     def validation(self, epoch):
         epoch_loss = 0
+        epoch_acc = 0
         total_size = 0
         for i, batch in enumerate(tqdm(self.dataloader['valid'], total=len(self.dataloader['valid']), desc=f"Validation...| Epoch {epoch+1}")):
             batch_size = -1
@@ -287,17 +289,20 @@ class BaseTrainer:
                     LOGGER.info(f"{'Loss':<25}{str(loss)}")
                     LOGGER.info(f"{'Accuracy':<25}{acc}")
                     self.valid_loss_history.append([step, loss])
-                    self.valid_acc_history.append([step, acc])
 
             epoch_loss += loss * batch_size
+            epoch_acc += acc * batch_size
             total_size += batch_size
 
         epoch_loss = epoch_loss / total_size
+        epoch_acc = epoch_acc / total_size
 
+        self.valid_acc_history.append([epoch, acc])
         if self.config.save_strategy == 'epoch' and self.is_rank_zero:
             self.save_checkpoint(epoch_loss, epoch + 1)
 
         LOGGER.info(f"{'Epoch Loss':<15}{epoch_loss}")
+        LOGGER.info(f"{'Epoch Accuracy':<15}{epoch_acc}")
 
 
     def train(self):
@@ -316,6 +321,29 @@ class BaseTrainer:
         if self.is_rank_zero:
             self.save_checkpoint(last_save=True)
             LOGGER.info(f"{'Completed training.'}")
+
+
+    def test(self):
+        preds, labels = [], []
+        for i, batch in enumerate(tqdm(self.dataloader, total=len(self.dataloader), desc="Test...")):
+            model_inputs = {}
+            for batch_key in batch.keys():
+                if isinstance(batch[batch_key], dict):
+                    for key in batch[batch_key].keys():
+                        if batch_key not in model_inputs:
+                            model_inputs[batch_key] = {}
+
+                        model_inputs[batch_key][key] = batch[batch_key][key].to(self.device)
+                        batch_size = batch[batch_key][key].size(0)
+                else:
+                    model_inputs[batch_key] = batch[batch_key].to(self.device)
+                    batch_size = batch[batch_key].size(0)
+
+            pred, label = self._test_step(model_inputs)
+            preds.extend(pred)
+            labels.extend(label)
+
+        save_confusion_matrix(preds, labels, self.config.model_type, self.config.checkpoint)
 
 
     def _save_checkpoint(

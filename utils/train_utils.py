@@ -80,7 +80,9 @@ def build_dataloader(dataset, batch_size, num_workers, shuffle, model_type, ddp=
             )
 
 
-def get_dataset(config, modes):
+def get_dataset(config, modes, tokenizer=None):
+    if modes == 'test':
+        return CustomDataset(config, config.test_data_path, tokenizer)
 
     tokenizer = AutoTokenizer.from_pretrained(config.tokenizer_path, cache_dir=config.cache_dir, trust_remote_code=True)
     datasets = [CustomDataset(config, config.train_data_path, tokenizer), CustomDataset(config, config.valid_data_path, tokenizer)]
@@ -104,3 +106,11 @@ def get_dataloader(config):
     dataloader = {mode: build_dataloader(dict_dataset[mode], config.batch_size, num_workers, mode == 'train', config.model_type, config.ddp, tokenizer.pad_token_id) for mode in modes}
 
     return dataloader, tokenizer
+
+def get_test_dataloader(config, tokenizer):
+    n_gpu = torch.cuda.device_count()
+    n_cpu = os.cpu_count()
+    num_workers = min([4 * n_gpu, config.batch_size // n_gpu, config.batch_size // n_cpu])  # number of workers
+
+    dataset = get_dataset(config, 'test', tokenizer)
+    return build_dataloader(dataset, config.batch_size, num_workers, True, config.model_type, config.ddp, tokenizer.pad_token_id)

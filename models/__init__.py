@@ -1,1 +1,1 @@
-from .modeling import BioModel
+from .modeling import ClassificationModel

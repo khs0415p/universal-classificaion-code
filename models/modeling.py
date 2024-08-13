@@ -6,7 +6,7 @@ from transformers import AutoModelForSequenceClassification
 class ClassificationModel(nn.Module):
     def __init__(self, config):
         super().__init__()
-        self.model = AutoModelForSequenceClassification.from_pretrained(config.model_path, num_labels=config.num_labels, cache_dir=config.cache_dir)
+        self.model = AutoModelForSequenceClassification.from_pretrained(config.model_path, num_labels=config.num_labels, cache_dir=config.cache_dir, trust_remote_code=True)
         self.config = self.model.config
 
 

@@ -1,0 +1,37 @@
+seed: 42
+model_type: roberta
+device: cuda                    # cpu, cuda, [0, 1] ...
+ddp: false                      # for multi-gpu training
+
+model_path: roberta-base   # huggingface path
+tokenizer_path: roberta-base
+num_labels: 22
+
+cache_dir: /data
+train_data_path: data/train.csv
+valid_data_path: data/valid.csv
+test_data_path: data/test.csv
+label2id: data/label2id.json
+
+fp16: false
+fp16_opt_level: "01"            # mixed precision
+
+max_length: 512                 # max-length for tokenize
+scheduler_type: cosine          # linear or cosine
+warmup_ratio: 0.1
+weight_decay: 0.01              # optimizer weight decay
+use_exclude: false              # excluding bias and norm from weight decay
+
+save_total_limit: 50
+epochs: 10
+batch_size: 64
+lr: 2e-5
+gradient_accumulation_steps: 1.0
+clip_max_norm: 1.0
+alpha: .25
+gamma: 2.0
+
+save_strategy: epoch            # epoch or step
+save_step: 10                   # if save_starategy is a step, the model saved at each save_step.
+compare_best: false             # if this option is true, compare loss and save model.
+log_step: 50                   # step for terminal log

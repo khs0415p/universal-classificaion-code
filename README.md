@@ -70,3 +70,25 @@ python main.py --config config/config.yaml
 ```
 python main.py --mode test --checkpoint <checkpoint folder>
 ```
+
+#### Test Result Samples
+
+- **confusion matrix**
+
+<img src="assets/confusion_matrix.png">
+
+<br>
+
+- **F1-score & Accuracy**
+
+<img src="assets/test.png">
+
+## Training Result Samples
+
+### Loss History (RoBERTa)
+
+<img src="assets/loss.png">
+
+### Accuracy History (RoBERTa)
+
+<img src="assets/acc.png">

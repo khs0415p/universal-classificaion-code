@@ -2,7 +2,7 @@ import json
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 
 def save_confusion_matrix(preds, labels, model_name='', checkpoint=''):
 
@@ -11,9 +11,6 @@ def save_confusion_matrix(preds, labels, model_name='', checkpoint=''):
     id2label = {v:k for k, v in label2id.items()}
     classes = list(map(lambda x:id2label[x], sorted(set(labels))))
 
-    print(labels)
-    print('===')
-    print(preds)
     cm = confusion_matrix(labels, preds)
 
     plt.figure(figsize=(8, 6))
@@ -26,3 +23,7 @@ def save_confusion_matrix(preds, labels, model_name='', checkpoint=''):
     
 
     plt.savefig(f"{checkpoint}/confusion_matrix_{model_name}.png", bbox_inches='tight', dpi=300)
+
+
+def get_metrics(preds, labels):
+    return f1_score(labels, preds, average="weighted"), accuracy_score(labels, preds)

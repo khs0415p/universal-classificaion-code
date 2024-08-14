@@ -13,7 +13,7 @@ from utils import (
     LOGGER,
 )
 from utils.file_utils import make_dir, remove_file
-from utils.metric_utils import save_confusion_matrix
+from utils.metric_utils import save_confusion_matrix, get_metrics
 from transformers import (
     get_linear_schedule_with_warmup,
     get_cosine_schedule_with_warmup,
@@ -344,6 +344,9 @@ class BaseTrainer:
             labels.extend(label)
 
         save_confusion_matrix(preds, labels, self.config.model_type, self.config.checkpoint)
+        f1, acc = get_metrics(preds, labels)
+        LOGGER.info(f"{'F1-score':<15}{f1}")
+        LOGGER.info(f"{'Accuracy':<15}{acc}")
 
 
     def _save_checkpoint(
@@ -383,6 +386,10 @@ class BaseTrainer:
         
         with open(f'{base_path}/checkpoint-info.pk', 'wb') as f:
             pickle.dump(save_items, f)
+
+        with open(f'{base_path}/acc_history.pk', 'wb') as f:
+            pickle.dump(save_items, f)
+
         LOGGER.info(f"{'Saved model...'}")
 
 

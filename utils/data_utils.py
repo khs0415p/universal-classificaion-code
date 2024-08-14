@@ -12,6 +12,7 @@ class CustomDataset(Dataset):
 
         self.max_length = config.max_length
         self.tokenizer = tokenizer
+        self.use_token_type_ids = self.config.model_type not in ["roberta", "distilbert"]
 
         self.data = pd.read_csv(data_path)
 
@@ -39,7 +40,7 @@ class CustomDataset(Dataset):
 
         return {
             "input_ids" : tokenized_sentence.input_ids.squeeze(),
-            "token_type_ids": tokenized_sentence.token_type_ids.squeeze() if self.config.model_type != "roberta" else None,
+            "token_type_ids": tokenized_sentence.token_type_ids.squeeze() if self.use_token_type_ids else None,
             "labels": torch.LongTensor([label])
         }
 

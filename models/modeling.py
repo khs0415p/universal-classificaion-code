@@ -11,7 +11,17 @@ class ClassificationModel(nn.Module):
 
 
     def forward(self, input_ids, attention_mask=None, token_type_ids=None, labels=None):
-        output = self.model(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids, labels=labels)
+        kwargs = {
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+            "token_type_ids": token_type_ids,
+            "labels": labels
+            }
+
+        if self.config.model_type in ["roberta", "distilbert"]:
+            kwargs.pop("token_type_ids")
+
+        output = self.model(**kwargs)
         return output
     
 

@@ -37,7 +37,7 @@ def collate_fn_warpper(padding_id, model_type):
 
 
 def collate_fn(batch: List[Dict[str, torch.Tensor]], padding_value: int = 0, model_type: str = '') -> Dict[str, torch.Tensor]:
-    if model_type == 'roberta':
+    if model_type in ['roberta', 'distilbert']:
         input_keys = ("input_ids", "labels")
     else:
         input_keys = ("input_ids", "token_type_ids", "labels")

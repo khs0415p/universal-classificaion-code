@@ -388,7 +388,7 @@ class BaseTrainer:
             pickle.dump(save_items, f)
 
         with open(f'{base_path}/acc_history.pk', 'wb') as f:
-            pickle.dump(save_items, f)
+            pickle.dump(self.valid_acc_history, f)
 
         LOGGER.info(f"{'Saved model...'}")
 

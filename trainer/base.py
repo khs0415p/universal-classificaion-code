@@ -343,8 +343,9 @@ class BaseTrainer:
             preds.extend(pred)
             labels.extend(label)
 
-        save_confusion_matrix(preds, labels, self.config.model_type, self.config.checkpoint)
-        f1, acc = get_metrics(preds, labels)
+        
+        f1, acc, cm = get_metrics(preds, labels)
+        save_confusion_matrix(labels, cm, self.config.model_type, self.config.checkpoint)
         LOGGER.info(f"{'F1-score':<15}{f1}")
         LOGGER.info(f"{'Accuracy':<15}{acc}")
 

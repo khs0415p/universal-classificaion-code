@@ -3,6 +3,7 @@ import torch
 import numpy
 import random
 import logging
+import matplotlib.pyplot as plt
 
 
 LOGGER_NAME = "Classification"
@@ -43,3 +44,21 @@ def setup_env():
     os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     os.environ['TORCH_USE_CUDA_DSA'] = '1'
+
+
+def save_loss_history(base_path, phase, model_name, loss_history, step):
+    losses = []
+    length = len(loss_history)
+    chunk_step = length // step
+    for i in range(0, length, chunk_step):
+        cur = [loss for _, loss in loss_history[i: i+chunk_step]]
+        losses.append(sum(cur) / len(cur))
+
+    plt.title(f"{phase} Loss History")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+
+    plt.plot(range(1, step + 1), losses, marker='o', label=model_name)
+    plt.xticks(range(1, step + 1))
+    plt.legend()
+    plt.savefig(f"{base_path}/{phase}_loss.png", bbox_inches='tight', dpi=300)

@@ -11,6 +11,7 @@ from tqdm import tqdm
 from utils import (
     set_seed,
     LOGGER,
+    save_loss_history
 )
 from utils.file_utils import make_dir, remove_file
 from utils.metric_utils import save_confusion_matrix, get_metrics
@@ -355,6 +356,7 @@ class BaseTrainer:
         base_path: str = None,
         loss: float = None,
         step: int = None,
+        last_save: bool = False,
     ):
         make_dir(base_path)
 
@@ -391,6 +393,10 @@ class BaseTrainer:
         with open(f'{base_path}/acc_history.pk', 'wb') as f:
             pickle.dump(self.valid_acc_history, f)
 
+        if last_save:
+            save_loss_history(base_path, "Train", self.config.model_type, self.train_loss_history, step)
+            save_loss_history(base_path, "Validation", self.config.model_type, self.valid_loss_history, step)
+
         LOGGER.info(f"{'Saved model...'}")
 
 
@@ -409,6 +415,7 @@ class BaseTrainer:
                 base_path,
                 loss,
                 step,
+                last_save
             )
             return
 

@@ -10,7 +10,8 @@ def apply_format(row, df_ratio):
     output = []
     
     for v, r in zip(row, df_ratio.loc[row.name]):
-        output.append(f"{v} ({r:.4f})")
+        r *= 100
+        output.append(f"{v} ({r:.1f}%)")
     
     return output
 

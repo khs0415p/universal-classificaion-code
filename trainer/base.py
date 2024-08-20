@@ -320,7 +320,7 @@ class BaseTrainer:
                 gc.collect()
 
         if self.is_rank_zero:
-            self.save_checkpoint(last_save=True)
+            self.save_checkpoint(step=epoch+1, last_save=True)
             LOGGER.info(f"{'Completed training.'}")
 
 

@@ -15,11 +15,14 @@ def apply_format(row, df_ratio):
     
     return output
 
-def save_confusion_matrix(labels, confusion_matrix, model_name='', checkpoint=''):
-    with open("data/label2id.json", "r") as f:
+def save_confusion_matrix(labels, preds, confusion_matrix, model_name='', checkpoint=''):
+    with open("../data/label2id.json", "r") as f:
         label2id = json.load(f)
     id2label = {v:k for k, v in label2id.items()}
-    classes = list(map(lambda x:id2label[x], sorted(set(labels))))
+
+    labels = set(labels) | set(preds)
+
+    classes = list(map(lambda x:id2label[x], sorted(labels)))
 
     plt.figure(figsize=(8, 6))
     sns.heatmap(confusion_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=classes, yticklabels=classes)

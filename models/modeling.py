@@ -18,7 +18,7 @@ class ClassificationModel(nn.Module):
             "labels": labels
             }
 
-        if self.config.model_type in ["roberta", "distilbert"]:
+        if any([model_name in self.config.model_type for model_name in ['roberta', 'distilbert']]):
             kwargs.pop("token_type_ids")
 
         output = self.model(**kwargs)

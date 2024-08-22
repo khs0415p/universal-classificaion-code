@@ -12,7 +12,7 @@ class CustomDataset(Dataset):
 
         self.max_length = config.max_length
         self.tokenizer = tokenizer
-        self.use_token_type_ids = self.config.model_type not in ["roberta", "distilbert"]
+        self.use_token_type_ids = all([model_name not in self.config.model_type for model_name in ['roberta', 'distilbert']])
 
         self.data = pd.read_csv(data_path)
 

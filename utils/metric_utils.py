@@ -16,7 +16,7 @@ def apply_format(row, df_ratio):
     return output
 
 def save_confusion_matrix(labels, preds, confusion_matrix, model_name='', checkpoint=''):
-    with open("../data/label2id.json", "r") as f:
+    with open("data/label2id.json", "r") as f:
         label2id = json.load(f)
     id2label = {v:k for k, v in label2id.items()}
 
